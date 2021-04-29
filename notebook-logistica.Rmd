@@ -1,0 +1,63 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+## Descrição dos dados
+
+Temos as seguintes variáveis no dataset: 
+  - *Age* : Idade
+  - *Sex* : Sex of the patient
+  - *exang*: angina induzida por exercício (1 = sim; 0 = não)
+  - *ca*: number of major vessels (0-3)
+  - *cp* : Tipo de dor no peito
+    Value 1: angina típica
+    Value 2: angina atípica
+    Value 3: dor não anginal
+    Value 4:assintomático
+  - *trtbps* : pressão sanguínea em repouso (em mm Hg)
+  - *chol* : colesterol em mg / dl obtido através do sensor de IMC
+  - *fbs* : (açúcar no sangue em jejum > 120 mg/dl) (1 = Sim; 0 = Não)
+  - *rest_ecg* : resultados eletrocardiográficos em repouso
+    Value 0: normal
+    Value 1: anormalidade da onda ST-T (Inversões de onda T e / ou elevação ou depressão de ST> 0,05 mV)
+    Value 2: mostrando hipertrofia ventricular esquerda provável ou definitiva pelos critérios de Estes
+  - *thalach* : maximum heart rate achieved
+  - *output* : 0= less chance of heart attack 1= more chance of heart attack
+```{r,echo=FALSE}
+heart=read.csv("C://Users/jocaj/Desktop/hearth_stats/heart.csv",header=T,sep=",",dec=".")
+
+heart$cp=as.factor(heart$cp)
+heart$sex=as.factor(heart$sex)
+heart$fbs=as.factor(heart$fbs)
+heart$exng=as.factor(heart$exng)
+heart$output=as.factor(heart$output)
+```
+
+### Descrição das variáveis Categóricas
+
+```{r}
+summary(heart[,c(2,3,6,9)])
+```
+
+### Verificando importância das variáveis para selecionar no modelo
+
+```{r}
+attach(heart)
+modelo=randomForest(output~.,data = heart[,-c(11:13)])
+importance(modelo)
+```
+
+### Ajuste de um modelo de regressão logístico
+
+```{r}
+logreg=glm(output~cp+trtbps+thalachh+oldpeak,data=heart,family = "binomial")
+summary(logreg)
+```
+
+### Matriz de confusão e erro de classificação
+
+```{r}
+modelo$confusion
+```
+
